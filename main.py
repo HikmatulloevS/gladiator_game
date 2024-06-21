@@ -43,9 +43,20 @@ async def get_character(id: int):
     return [character for character in characters if character.get("id") == id]
 
 
-### В ДОРАБОТКЕ!!!
-# @app.put("/api/characters/{id}/attributes")
-# async def adjust_character_attributes(upgrade: Upgrade):
-#     # char = [character for character in characters if character.get("id") == id]
-#     return upgrade.agility + upgrade.stamina + upgrade.strength
-#     # return type(char)
+
+@app.put("/api/characters/{char_id}/attributes")
+async def adjust_character_attributes(char_id: int, upgrade: Upgrade):
+    char = [character for character in characters if character.get("id") == char_id]
+    if len(char) < 1:
+        return {"response" : "character not found"}
+    char = char[0]
+
+    amount_pt = upgrade.agility + upgrade.stamina + upgrade.strength
+    if not amount_pt <= char["availablePoints"]:
+        return {"response": "Not enough points"}
+    char["strength"] += upgrade.strength
+    char["agility"] += upgrade.agility
+    char["stamina"] += upgrade.stamina
+    char["availablePoints"] -= amount_pt
+
+    return {"response": "success"}
