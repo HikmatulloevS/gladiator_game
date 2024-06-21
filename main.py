@@ -24,6 +24,10 @@ class Upgrade(BaseModel):
     stamina: int = 0
 
 
+def get_id(characters, id):
+    return [char for char in characters if char.get("id") == id]
+
+
 app = FastAPI()
 
 
@@ -40,15 +44,14 @@ async def create_character(character: Character):
 
 @app.get("/api/characters/{id}")
 async def get_character(id: int):
-    return [character for character in characters if character.get("id") == id]
+    return get_id(characters, id)
 
 
-
-@app.put("/api/characters/{char_id}/attributes")
-async def adjust_character_attributes(char_id: int, upgrade: Upgrade):
-    char = [character for character in characters if character.get("id") == char_id]
+@app.put("/api/characters/{id}/attributes")
+async def adjust_character_attributes(id: int, upgrade: Upgrade):
+    char = get_id(characters, id)
     if len(char) < 1:
-        return {"response" : "character not found"}
+        return {"response": "character not found"}
     char = char[0]
 
     amount_pt = upgrade.agility + upgrade.stamina + upgrade.strength
