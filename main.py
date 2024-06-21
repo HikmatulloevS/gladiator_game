@@ -32,14 +32,14 @@ app = FastAPI()
 
 
 @app.get("/")
-async def check(name):
-    return f"checking 1{name}"
+async def check():
+    return f"checking"
 
 
 @app.post("/api/characters")
 async def create_character(character: Character):
     characters.append(character)
-    return character, characters
+    return {"response": f"success \n{character}"}
 
 
 @app.get("/api/characters/{id}")
@@ -62,4 +62,4 @@ async def adjust_character_attributes(id: int, upgrade: Upgrade):
     char["stamina"] += upgrade.stamina
     char["availablePoints"] -= amount_pt
 
-    return {"response": "success"}
+    return {"response": f"success \n{char}"}
