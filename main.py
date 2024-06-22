@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 characters = [
@@ -9,8 +9,8 @@ characters = [
 
 
 class Character(BaseModel):
-    name: str = None
     id: int = len(characters) + 1,
+    name: str = None
     strength: int = 0,
     agility: int = 0,
     stamina: int = 0,
@@ -36,20 +36,20 @@ app = FastAPI()
 
 @app.get("/")
 async def check():
-    return f"checking"
+    return "checking"
 
 
 @app.post("/api/characters")
 async def create_character(character: Character):
     characters.append(character)
-    return {"response": f"success \n{character}"}
+    return character
 
 
 @app.get("/api/characters/{id}")
 async def get_character(id: int):
     char = get_id(id)
     if char is None:
-        return {"response": "Character not found"}
+        raise HTTPException(status_code=404, detail="Character not found")
     return char
 
 
@@ -57,7 +57,7 @@ async def get_character(id: int):
 async def adjust_character_attributes(id: int, upgrade: Upgrade):
     char = get_id(id)
     if char is None:
-        return {"response": "Character not found"}
+        raise HTTPException(status_code=404, detail="Character not found")
     amount_pt = upgrade.agility + upgrade.stamina + upgrade.strength
     if not amount_pt <= char["availablePoints"]:
         return {"response": "Not enough points"}
@@ -66,4 +66,4 @@ async def adjust_character_attributes(id: int, upgrade: Upgrade):
     char["stamina"] += upgrade.stamina
     char["availablePoints"] -= amount_pt
 
-    return {"response": f"success \n{char}"}
+    return {"response": f"{char}"}
