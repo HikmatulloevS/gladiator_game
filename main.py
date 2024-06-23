@@ -48,15 +48,17 @@ def get_lb_id(id: int):
         return lobby[0]
     return None
 
+
 @app.get("/")
 async def check():
     return "checking"
 
 
 @app.post("/api/characters")
-async def create_character(character: Character):
-    characters.append(character)
-    return character
+async def create_character(name: dict):
+    char = Character(name=name["name"])
+    characters.append(char)
+    return char
 
 
 @app.get("/api/characters/{id}")
@@ -76,7 +78,7 @@ async def adjust_character_attributes(id: int, upgrade: Upgrade):
     if not amount_pt <= char["availablePoints"]:
         return {"response": "Not enough points"}
 
-    #Обновление навыков
+    # Обновление навыков
     char["strength"] += upgrade.strength
     char["agility"] += upgrade.agility
     char["stamina"] += upgrade.stamina
@@ -94,17 +96,17 @@ async def create_lobby():
 
 @app.post("/api/lobbies/{lobbyId}/join")
 async def join_lobby(lobbyId: int, char_id: dict):
-    #Поиск лобби
+    # Поиск лобби
     lobby: Lobby = get_lb_id(lobbyId)
     if lobby is None:
         raise HTTPException(status_code=404, detail="Lobby not found")
 
-    #Поиск персонажа
+    # Поиск персонажа
     character: Character = get_char_id(char_id["characterId"])
     if character is None:
         raise HTTPException(status_code=404, detail="Character not found")
 
-    #Подключение игрока в лобби
+    # Подключение игрока в лобби
     if character in lobby["players"]:
         raise HTTPException(status_code=404, detail="Character is already in lobby")
     lobby["players"].append(character)
