@@ -55,8 +55,8 @@ async def check():
 
 
 @app.post("/api/characters")
-async def create_character(name: dict):
-    char = Character(name=name["name"])
+async def create_character(char_name: dict):
+    char = Character(name=char_name["name"])
     characters.append(char)
     return char
 
