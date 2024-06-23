@@ -24,12 +24,6 @@ class Character(BaseModel):
     availablePoints: int = 5
 
 
-class Upgrade(BaseModel):
-    strength: int = 0
-    agility: int = 0
-    stamina: int = 0
-
-
 class Lobby(BaseModel):
     id: int = None
     players: list = []
@@ -55,8 +49,8 @@ async def check():
 
 
 @app.post("/api/characters")
-async def create_character(char_name: dict):
-    char = Character(name=char_name["name"])
+async def create_character(name: dict):
+    char = Character(name=name["name"])
     characters.append(char)
     return char
 
@@ -70,18 +64,18 @@ async def get_character(id: int):
 
 
 @app.put("/api/characters/{id}/attributes")
-async def adjust_character_attributes(id: int, upgrade: Upgrade):
+async def adjust_character_attributes(id: int, upgrade: dict):
     char = get_char_id(id)
     if char is None:
         raise HTTPException(status_code=404, detail="Character not found")
-    amount_pt = upgrade.agility + upgrade.stamina + upgrade.strength
+    amount_pt = upgrade["agility"] + upgrade["stamina"] + upgrade["strength"]
     if not amount_pt <= char["availablePoints"]:
         return {"response": "Not enough points"}
 
     # Обновление навыков
-    char["strength"] += upgrade.strength
-    char["agility"] += upgrade.agility
-    char["stamina"] += upgrade.stamina
+    char["strength"] += upgrade["strength"]
+    char["agility"] += upgrade["agility"]
+    char["stamina"] += upgrade["stamina"]
     char["availablePoints"] -= amount_pt
 
     return {"response": f"{char}"}
